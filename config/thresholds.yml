@@ -1,0 +1,12 @@
+ndvi_drop_pct_threshold: 20
+rainfall_soja_mm: 15
+rainfall_maiz_mm: 20
+base_yield_soja_tn_ha: 3.0
+base_yield_maiz_tn_ha: 8.0
+base_yield_trigo_tn_ha: 4.5
+debt_ratio_threshold: 0.7
+rinde_clamp_min: 0.4
+rinde_clamp_max: 1.5
+critical_months_soja: [1, 2]
+critical_months_maiz: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+critical_months_trigo: [1, 2, 3, 4, 5, 9, 10, 11, 12]

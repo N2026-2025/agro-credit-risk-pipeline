@@ -1,0 +1,70 @@
+<svg class="dark " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 833.5 248" width="833.5" height="248" id="ma902cd__root" data-diagram-type="ascii">
+  <style data-mercat-style="universal">.mercat text{font-family:'Google Sans',Roboto,Arial,sans-serif;fill:var(--m-text);dominant-baseline:central}.mercat .m-node .m-shape{fill:var(--m-node-fill);stroke:var(--m-node-stroke);stroke-width:1.5px}.mercat .m-edge .m-path{fill:none;stroke:var(--m-line);stroke-width:1.5px}.mercat .m-note .m-shape{fill:var(--m-note-fill);stroke:var(--m-note-stroke);stroke-width:1px}.mercat .m-note .m-label{fill:var(--m-note-text)}.mercat .t-label{font-size:13px;font-weight:500}</style>
+  <style data-mercat-style="theme-light">#ma902cd__root{--m-bg:#ffffff;--m-text:#1f1f1f;--m-line:#545454;--m-node-fill:#f8f9fa;--m-node-stroke:#747775;--m-note-fill:#fef9e7;--m-note-stroke:#f39c12;--m-note-text:#1f1f1f}</style>
+  <style data-mercat-style="theme-dark">#ma902cd__root.dark{--m-bg:#1f1f1f;--m-text:#e3e3e3;--m-line:#bfbfbf;--m-node-fill:#2d2e30;--m-node-stroke:#8e918f;--m-note-fill:#69550d;--m-note-stroke:#f39c12;--m-note-text:#e3e3e3}</style>
+  <style data-mercat-style="type">#ma902cd__root .rect-pill,#ma902cd__root .stadium-pill{fill:var(--m-bg);stroke:var(--m-node-stroke);stroke-width:1.5px}#ma902cd__root .label-text{fill:var(--m-text);font-size:13px;font-weight:500;white-space:pre}#ma902cd__root .arrow-line,#ma902cd__root .bus-line{fill:none;stroke:var(--m-line);stroke-width:1.5px;stroke-linecap:round;stroke-linejoin:round}#ma902cd__root .annotation-text{fill:var(--m-text);font-size:12px;font-weight:500;white-space:pre}</style>
+  <style data-mercat-style="diagram">#ma902cd__root text{font-family:Google Sans Mono, Roboto Mono, monospace}</style>
+  <g class="mercat mercat-ascii">
+    <defs>
+      <marker id="ma902cd__mk-arrow" refX="9.45" refY="3.4" markerWidth="10.8" markerHeight="6.8" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M 0 0 L 10.8 3.4 L 0 6.8 Z" class="m-marker" fill="var(--m-line)" stroke="none"/>
+      </marker>
+    </defs>
+    <g class="m-node shape inner" id="ma902cd__node__n0" data-role="step">
+      <rect x="15" y="15" width="293.5" height="20" rx="3" ry="3" class="m-shape rect-pill"/>
+      <text x="161.75" y="25" class="m-label t-label label-text" text-anchor="middle">Planetary Computer (Sentinel-2)</text>
+    </g>
+    <g class="m-node shape inner" id="ma902cd__node__n1" data-role="step">
+      <rect x="15" y="37" width="293.5" height="20" rx="3" ry="3" class="m-shape rect-pill"/>
+      <text x="161.75" y="47" class="m-label t-label label-text" text-anchor="middle">Open-Meteo API (Lluvias/Temp)</text>
+    </g>
+    <g class="m-node shape inner" id="ma902cd__node__n2" data-role="step">
+      <rect x="380.5" y="37" width="429.5" height="20" rx="3" ry="3" class="m-shape rect-pill"/>
+      <text x="595.25" y="47" class="m-label t-label label-text" text-anchor="middle">BRONZE: MinIO / S3 (Raw JSON + GeoTIFF/Parquet)</text>
+    </g>
+    <g class="m-node shape inner" id="ma902cd__node__n3" data-role="step">
+      <rect x="15" y="59" width="293.5" height="20" rx="3" ry="3" class="m-shape rect-pill"/>
+      <text x="161.75" y="69" class="m-label t-label label-text" text-anchor="middle">BCRA API (Deudas + Cheques)</text>
+    </g>
+    <g class="m-node shape inner" id="ma902cd__node__n4" data-role="step">
+      <rect x="15" y="81" width="293.5" height="20" rx="3" ry="3" class="m-shape rect-pill"/>
+      <text x="161.75" y="91" class="m-label t-label label-text" text-anchor="middle">Granos.ar API (Pizarra Rosario)</text>
+    </g>
+    <g class="m-node shape inner" id="ma902cd__node__n5" data-role="step">
+      <rect x="346.5" y="103" width="336" height="20" rx="3" ry="3" class="m-shape rect-pill"/>
+      <text x="514.5" y="113" class="m-label t-label label-text" text-anchor="middle">SILVER: Polars / PySpark + GeoPandas</text>
+    </g>
+    <g class="m-node shape inner" id="ma902cd__node__n6" data-role="step">
+      <rect x="346.5" y="125" width="472" height="20" rx="10" ry="10" class="m-shape stadium-pill"/>
+      <text x="582.5" y="135" class="m-label t-label label-text" text-anchor="middle">Limpieza, máscara de nubes, cruce espacial y por fecha</text>
+    </g>
+    <g class="m-node shape inner" id="ma902cd__node__n7" data-role="step">
+      <rect x="346.5" y="191" width="327.5" height="20" rx="3" ry="3" class="m-shape rect-pill"/>
+      <text x="510.25" y="201" class="m-label t-label label-text" text-anchor="middle">GOLD: DuckDB / PostgreSQL + PostGIS</text>
+    </g>
+    <g class="m-edge" id="ma902cd__edge__n0__pt__0" data-role="connector">
+      <line x1="308.5" y1="25" x2="340.25" y2="25" class="m-path bus-line"/>
+    </g>
+    <g class="m-edge" id="ma902cd__edge__n1__n2__0" data-role="connector">
+      <line x1="308.5" y1="47" x2="379.15" y2="47" class="m-path arrow-line" marker-end="url(#ma902cd__mk-arrow)"/>
+    </g>
+    <g class="m-edge" id="ma902cd__edge__n3__pt__0" data-role="connector">
+      <line x1="308.5" y1="69" x2="340.25" y2="69" class="m-path bus-line"/>
+    </g>
+    <g class="m-edge" id="ma902cd__edge__n4__n5__0" data-role="connector">
+      <line x1="308.5" y1="91" x2="340.25" y2="91" class="m-path bus-line"/>
+    </g>
+    <g class="m-edge" id="ma902cd__edge__pt__n5__0" data-role="connector">
+      <line x1="340.25" y1="25" x2="340.25" y2="91" class="m-path bus-line"/>
+    </g>
+    <g class="m-edge" id="ma902cd__edge__n2__pt__0" data-role="connector">
+      <line x1="510.25" y1="69" x2="510.25" y2="89.65" class="m-path arrow-line" marker-end="url(#ma902cd__mk-arrow)"/>
+    </g>
+    <g class="m-edge" id="ma902cd__edge__n6__n7__0" data-role="connector">
+      <line x1="510.25" y1="145" x2="510.25" y2="189.65" class="m-path arrow-line" marker-end="url(#ma902cd__mk-arrow)"/>
+    </g>
+    <g class="m-node m-note" id="ma902cd__note__a0" data-role="annotation">
+      <text x="344.5" y="223" class="m-label t-label annotation-text" text-anchor="start">(Tabla Maestra de Riesgo Crediticio por Lote y CUIT)</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=agro
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  airflow:
+    image: apache/airflow:2.9.1
+    container_name: airflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://postgres:postgres@postgres:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=CHANGEME
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth
+      - MINIO_ENDPOINT_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/opt/airflow/src
+      - ./src/dags:/opt/airflow/dags
+    command: airflow standalone
+    healthcheck:
+      test: ["CMD", "airflow", "version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  minio_data:
