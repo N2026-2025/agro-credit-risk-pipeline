@@ -1,7 +1,6 @@
 """Configuration loader for thresholds and critical month settings."""
 
 from pathlib import Path
-from typing import Any
 
 
 def load_thresholds(path: str = "config/thresholds.yml") -> dict:

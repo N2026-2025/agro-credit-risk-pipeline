@@ -7,10 +7,7 @@ Writes: silver/weather/{date}/weather_lot.parquet
 
 import json
 import logging
-import os
 import sys
-from datetime import datetime
-from pathlib import Path
 
 import polars as pl
 
@@ -29,7 +26,7 @@ def extract_weather_values(raw_json: dict) -> dict:
     if not dates:
         return {"rainfall_mm": None, "temp_max_c": None, "temp_min_c": None}
 
-    idx = dates[0]  # single-day request returns one entry
+    dates[0]  # single-day request returns one entry
     return {
         "rainfall_mm": precip[0] if precip else None,
         "temp_max_c": temp_max[0] if temp_max else None,

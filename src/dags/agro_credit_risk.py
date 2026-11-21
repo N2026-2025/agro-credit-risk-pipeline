@@ -14,10 +14,6 @@ from airflow.operators.python import PythonOperator
 
 from config.thresholds import load_thresholds
 from src.gold.fact import build_fact_table
-from src.silver.bcra_join import process_bcra
-from src.silver.ndvi import process_ndvi
-from src.silver.prices_join import process_prices
-from src.silver.weather_join import process_weather
 from src.bronze.planetary import extract_planetary
 from src.bronze.weather import extract_weather
 from src.bronze.bcra import extract_bcra

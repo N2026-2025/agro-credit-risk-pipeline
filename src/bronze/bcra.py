@@ -14,7 +14,6 @@ import logging
 import os
 import sys
 import time
-from pathlib import Path
 
 import requests
 from minio import Minio
@@ -93,7 +92,7 @@ def extract_bcra(cuit: str, eval_date: str) -> dict:
     json_path = f"/tmp/{cuit}_bcra.json"
     with open(json_path, "w") as f:
         json.dump(merged, f)
-    save_to_minio(client, bucket, key, json_path)
+    client.fput_object(bucket, key, json_path)
 
     return {"bcra_json": key}
 

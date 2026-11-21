@@ -8,9 +8,7 @@ Writes: silver/prices/{date}/prices_lot.parquet
 
 import json
 import logging
-import os
 import sys
-from pathlib import Path
 
 import polars as pl
 

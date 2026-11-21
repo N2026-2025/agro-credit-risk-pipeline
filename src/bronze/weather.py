@@ -14,7 +14,6 @@ import logging
 import os
 import sys
 from datetime import datetime
-from pathlib import Path
 
 import requests
 from minio import Minio
@@ -63,7 +62,7 @@ def extract_weather(lot_id: str, lat: float, lon: float, eval_date: str) -> dict
     json_path = f"/tmp/{lot_id}_weather.json"
     with open(json_path, "w") as f:
         json.dump(weather, f)
-    save_to_minio(client, bucket, key, json_path)
+    client.fput_object(bucket, key, json_path)
     
     return {"weather_json": key}
 

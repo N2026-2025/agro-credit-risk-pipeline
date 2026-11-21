@@ -9,15 +9,12 @@ import os
 import json
 import logging
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Optional
 
 import planetary_computer
 import pystac_client
 import rasterio
 from minio import Minio
 from pystac import Item
-import requests
 
 logger = logging.getLogger(__name__)
 

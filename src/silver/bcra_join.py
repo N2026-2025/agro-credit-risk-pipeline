@@ -6,7 +6,6 @@ Writes to silver/bcra/{date}/bcra_lot.parquet
 
 import json
 import logging
-import os
 import sys
 
 import polars as pl

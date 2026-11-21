@@ -4,7 +4,6 @@ import json
 import numpy as np
 import rasterio
 from pathlib import Path
-import polars as pl
 
 from src.silver.ndvi import calc_ndvi, process_ndvi
 

@@ -1,6 +1,5 @@
 """Unit tests for BCRA debt ratio and alert logic."""
 
-import polars as pl
 
 from src.gold.fact import compute_ndvi_drop, compute_rinde_est
 
@@ -43,7 +42,6 @@ def test_alert_agronomic_logic():
     """Alert 'Alta' when ndvi_drop > 20% AND rainfall below threshold in critical month."""
     ndvi_drop = 25.0
     rainfall_mm = 10.0
-    critical_month = 1  # January - critical for soja
     ndvi_threshold = 20
     rain_threshold = 15
 
