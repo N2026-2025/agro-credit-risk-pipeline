@@ -11,11 +11,18 @@ Usage:
 import logging
 import sys
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import rasterio
 import geopandas as gpd
 import polars as pl
+
+from src.schemas.contracts import (
+    SilverNDVIRecord,
+    validate_against_schema,
+)
+from src.schemas.quarantine import ensure_quarantine_table, quarantine_record
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,7 +40,14 @@ def calc_ndvi(b08: np.ndarray, b04: np.ndarray) -> np.ndarray:
     return ndvi
 
 
-def process_ndvi(tiff_path: str, geojson_path: str, lot_id: str = None) -> pl.DataFrame:
+def process_ndvi(
+    tiff_path: str,
+    geojson_path: str,
+    lot_id: str = None,
+    eval_date: Optional[str] = None,
+    pg_conn=None,
+    pipeline_run_id: Optional[str] = None,
+) -> pl.DataFrame:
     """Full NDVI processing pipeline; returns lot-level median NDVI."""
     with rasterio.open(tiff_path) as src:
         # Clip to lot polygon first
@@ -56,13 +70,37 @@ def process_ndvi(tiff_path: str, geojson_path: str, lot_id: str = None) -> pl.Da
         valid_ndvi = ndvi[~np.isnan(ndvi)]
 
     if len(valid_ndvi) == 0:
-        result = {"lot_id": lot_id or Path(geojson_path).stem, "ndvi_median": FILL_NDVI, "ndvi_count": 0}
+        result = {
+            "lot_id": lot_id or Path(geojson_path).stem,
+            "ndvi_median": FILL_NDVI,
+            "ndvi_count": 0,
+        }
     else:
         result = {
             "lot_id": lot_id or Path(geojson_path).stem,
             "ndvi_median": round(float(np.nanmedian(valid_ndvi)), 6),
             "ndvi_count": int(len(valid_ndvi)),
         }
+
+    # Validate against SilverNDVIRecord schema
+    if eval_date:
+        result["eval_date"] = eval_date
+        result["source"] = "planetary_computer"
+        validated, errors = validate_against_schema(result, SilverNDVIRecord)
+        if errors:
+            if pg_conn:
+                ensure_quarantine_table(pg_conn)
+                quarantine_record(
+                    conn=pg_conn,
+                    source_system="ndvi_silver",
+                    raw_payload=result,
+                    validation_errors=errors,
+                    eval_date=eval_date,
+                    lot_id_or_cuit=lot_id,
+                    pipeline_run_id=pipeline_run_id,
+                )
+            logger.error(f"NDVI silver validation failed for lot {lot_id}: {errors}")
+            return pl.DataFrame()
 
     return pl.DataFrame([result])
 

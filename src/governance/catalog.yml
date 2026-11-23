@@ -1,0 +1,255 @@
+# Data Catalog - Column documentation for the agro-credit risk pipeline
+# Each column documents: business meaning, unit of measure, source, owner
+# This file is consumed by dbt docs and data governance tools.
+#
+# Policy-as-Code: masked_columns / tokenized_columns indicate dynamic PII handling.
+# Updated 2026-11-23: adds masking/tokenization rules from src/policies/
+
+version: "1.1"
+pipeline: agro_credit_risk
+generated_at: "2026-11-22T00:00:00Z"
+
+sources:
+  - name: bcra
+    description: "BCRA Central de Deudores - Deuda y cheques rechazados por CUIT"
+    url: "https://www.bcra.gob.ar/apis-banco-central/"
+    owner: "data-eng@agrocredit.com"
+    update_frequency: "daily"
+    columns:
+      - name: cuit
+        business_meaning: "Identificador único del productor agropecuario (CUIT argentino)"
+        unit_of_measure: "none"
+        data_type: "text"
+        source_column: "cuit"
+        transformation: "identity"
+        pii: true
+        masked: true
+        tokenized: true
+      - name: deuda_total_ars
+        business_meaning: "Deuda total del productor en el sistema financiero argentino"
+        unit_of_measure: "ARS"
+        data_type: "float"
+        source_column: "deudaTotal"
+        transformation: "float_cast"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: situacion_risk
+        business_meaning: "Situación crediticia del productor (1=normal, 5=máximo riesgo)"
+        unit_of_measure: "none"
+        data_type: "integer"
+        source_column: "situacion"
+        transformation: "int_cast"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: cheques_sin_fondos
+        business_meaning: "Cantidad de cheques rechazados por falta de fondos"
+        unit_of_measure: "count"
+        data_type: "integer"
+        source_column: "chequesRechazados"
+        transformation: "int_cast"
+        pii: false
+        masked: false
+        tokenized: false
+  - name: granos
+    description: "Precios pizarra Rosario y tipo de cambio oficial (granos.ar / MAGyP)"
+    url: "http://granos.ar/api-docs/"
+    owner: "data-eng@agrocredit.com"
+    update_frequency: "daily"
+    columns:
+      - name: soja_ars_tn
+        business_meaning: "Precio de la soja en pizarra Rosario"
+        unit_of_measure: "ARS_per_ton"
+        data_type: "float"
+        source_column: "precios.soja.precio_ars_tn"
+        transformation: "extract_nested"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: maiz_ars_tn
+        business_meaning: "Precio del maíz en pizarra Rosario"
+        unit_of_measure: "ARS_per_ton"
+        data_type: "float"
+        source_column: "precios.maiz.precio_ars_tn"
+        transformation: "extract_nested"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: trigo_ars_tn
+        business_meaning: "Precio del trigo en pizarra Rosario"
+        unit_of_measure: "ARS_per_ton"
+        data_type: "float"
+        source_column: "precios.trigo.precio_ars_tn"
+        transformation: "extract_nested"
+        pii: false
+        masked: false
+        tokenized: false
+  - name: planetary_computer
+    description: "Sentinel-2 L2A imagery via Microsoft Planetary Computer STAC API"
+    url: "https://planetarycomputer.microsoft.com/"
+    owner: "data-eng@agrocredit.com"
+    update_frequency: "daily"
+    columns:
+      - name: ndvi_median
+        business_meaning: "Valor mediano del Índice de Vegetación de Diferencia Normalizada para el lote"
+        unit_of_measure: "none"
+        data_type: "float"
+        source_column: "calculated_from_bands"
+        transformation: "(B08 - B04) / (B08 + B04) with SCL cloud mask"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: ndvi_count
+        business_meaning: "Cantidad de píxeles válidos usados para calcular el NDVI mediano"
+        unit_of_measure: "count"
+        data_type: "integer"
+        source_column: "calculated_from_bands"
+        transformation: "count_valid_pixels"
+        pii: false
+        masked: false
+        tokenized: false
+  - name: open_meteo
+    description: "Datos climáticos históricos por coordenadas (Open-Meteo Archive API)"
+    url: "https://open-meteo.com/"
+    owner: "data-eng@agrocredit.com"
+    update_frequency: "daily"
+    columns:
+      - name: rainfall_mm
+        business_meaning: "Precipitación acumulada diaria en milímetros"
+        unit_of_measure: "mm"
+        data_type: "float"
+        source_column: "daily.precipitation_sum"
+        transformation: "extract_first_value"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: temp_max_c
+        business_meaning: "Temperatura máxima diaria"
+        unit_of_measure: "celsius"
+        data_type: "float"
+        source_column: "daily.temperature_2m_max"
+        transformation: "extract_first_value"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: temp_min_c
+        business_meaning: "Temperatura mínima diaria"
+        unit_of_measure: "celsius"
+        data_type: "float"
+        source_column: "daily.temperature_2m_min"
+        transformation: "extract_first_value"
+        pii: false
+        masked: false
+        tokenized: false
+
+targets:
+  - name: fact_agro_credit_risk
+    description: "Tabla maestro de riesgo crediticio agropecuario por lote y fecha"
+    owner: "data-eng@agrocredit.com"
+    update_frequency: "daily"
+    storage: "postgresql"
+    partitioning: "none (upsert on cuit + eval_date)"
+    columns:
+      - name: lot_id
+        business_meaning: "Identificador único del lote agrícola"
+        unit_of_measure: "none"
+        data_type: "text"
+        source_column: "dim_cartera_clientes.cuit"
+        transformation: "identity"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: cuit
+        business_meaning: "CUIT del productor dueño del lote"
+        unit_of_measure: "none"
+        data_type: "text"
+        source_column: "dim_cartera_clientes.cuit"
+        transformation: "identity"
+        pii: true
+        masked: true
+        tokenized: true
+      - name: eval_date
+        business_meaning: "Fecha de evaluación del riesgo"
+        unit_of_measure: "date"
+        data_type: "text"
+        source_column: "pipeline_run_date"
+        transformation: "identity"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: ndvi
+        business_meaning: "NDVI actual del lote (índice de salud vegetal)"
+        unit_of_measure: "none"
+        data_type: "float"
+        source_column: "silver.ndvi_median"
+        transformation: "identity"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: ndvi_drop_pct
+        business_meaning: "Caída porcentual del NDVI vs promedio histórico del lote"
+        unit_of_measure: "percent"
+        data_type: "float"
+        source_column: "calculated"
+        transformation: "(ndvi_hist_avg - ndvi) / ndvi_hist_avg * 100"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: expected_harvest_usd
+        business_meaning: "Valor esperado de la cosecha en dólares"
+        unit_of_measure: "USD"
+        data_type: "float"
+        source_column: "calculated"
+        transformation: "hectareas * rinde_est_tn_ha * precio_usd_tn"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: debt_ratio
+        business_meaning: "Ratio de deuda bancaria sobre valor esperado de cosecha"
+        unit_of_measure: "ratio"
+        data_type: "float"
+        source_column: "calculated"
+        transformation: "bcra_debt_ars / expected_harvest_usd (convertido a USD)"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: alert_agronomic
+        business_meaning: "Alerta agronómica: NDVI bajo + lluvia insuficiente en mes crítico"
+        unit_of_measure: "none"
+        data_type: "text"
+        source_column: "calculated"
+        transformation: "ndvi_drop > 20% AND rainfall < threshold AND critical_month"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: alert_default
+        business_meaning: "Alerta de default preventivo: deuda > 70% de cosecha o cheques rechazados"
+        unit_of_measure: "none"
+        data_type: "text"
+        source_column: "calculated"
+        transformation: "debt_ratio > 0.7 OR cheques_rechazados > 0"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: dolar_oficial
+        business_meaning: "Tipo de cambio oficial mayorista (ARS por USD)"
+        unit_of_measure: "ARS_per_USD"
+        data_type: "float"
+        source_column: "dolar_oficial"
+        transformation: "float_cast"
+        pii: false
+        masked: false
+        tokenized: false
+      - name: soja_usd_tn
+        business_meaning: "Precio de la soja en dólares por tonelada"
+        unit_of_measure: "USD_per_ton"
+        data_type: "float"
+        source_column: "calculated"
+        transformation: "soja_ars_tn / dolar_oficial"
+        pii: false
+        masked: false
+        tokenized: false
+
+policy_version: "1.0"
+applied_from: ["src/policies/pii_masking.yml", "src/policies/access_control.yml"]
